@@ -2,7 +2,13 @@
 
 import { redirect } from 'next/navigation';
 import { parseWithZod } from '@conform-to/zod';
-import { todosSchema, loginSchema, createSignupSchema } from '@/app/schema';
+import {
+	todosSchema,
+	loginSchema,
+	createSignupSchema,
+	staleSchema,
+} from '@/app/schema';
+import * as fs from 'fs';
 
 export async function login(prevState: unknown, formData: FormData) {
 	const submission = parseWithZod(formData, {
@@ -49,4 +55,18 @@ export async function signup(prevState: unknown, formData: FormData) {
 	}
 
 	redirect(`/?value=${JSON.stringify(submission.value)}`);
+}
+
+export async function staleAction(prevState: unknown, formData: FormData) {
+	const submission = parseWithZod(formData, {
+		schema: staleSchema,
+	});
+
+	if (submission.status !== 'success') {
+		return submission.reply();
+	}
+
+	await fs.promises.writeFile('database.txt', submission.value.value);
+
+	return { status: 'success' as const };
 }

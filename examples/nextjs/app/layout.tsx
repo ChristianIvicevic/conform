@@ -35,6 +35,9 @@ export default function RootLayout({
 						<li>
 							<Link href="signup">Signup</Link>
 						</li>
+						<li>
+							<Link href="stale">Stale</Link>
+						</li>
 					</ul>
 
 					<hr />

@@ -1,7 +1,7 @@
 'use client';
 
 import { useFormState, useFormStatus } from 'react-dom';
-import { login, signup, createTodos } from '@/app/actions';
+import { login, signup, createTodos, staleAction } from '@/app/actions';
 import {
 	useForm,
 	getFormProps,
@@ -9,7 +9,14 @@ import {
 	getFieldsetProps,
 } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod';
-import { todosSchema, loginSchema, createSignupSchema } from '@/app/schema';
+import {
+	todosSchema,
+	loginSchema,
+	createSignupSchema,
+	staleSchema,
+} from '@/app/schema';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 function Button(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
 	const { pending } = useFormStatus();
@@ -196,6 +203,40 @@ export function SignupForm() {
 			</label>
 			<hr />
 			<Button>Signup</Button>
+		</form>
+	);
+}
+
+export function StaleForm({ value }: { value: string }) {
+	const router = useRouter();
+	const [lastResult, action] = useFormState(staleAction, undefined);
+	const [form, fields] = useForm({
+		lastResult,
+		onValidate({ formData }) {
+			return parseWithZod(formData, { schema: staleSchema });
+		},
+		defaultValue: { value },
+	});
+
+	useEffect(() => {
+		if (lastResult?.status === 'success') {
+			router.refresh();
+		}
+	}, [lastResult, router]);
+
+	return (
+		<form action={action} {...getFormProps(form)}>
+			<div>Current value from parent: {value}</div>
+			<div>
+				<label>Value</label>
+				<input
+					className={!fields.value.valid ? 'error' : ''}
+					{...getInputProps(fields.value, { type: 'text' })}
+					key={fields.value.key}
+				/>
+				<div>{fields.value.errors}</div>
+			</div>
+			<Button>Submit</Button>
 		</form>
 	);
 }

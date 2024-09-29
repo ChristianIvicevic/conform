@@ -83,3 +83,7 @@ export function createSignupSchema(
 				}),
 		);
 }
+
+export const staleSchema = z.object({
+	value: z.string(),
+});
