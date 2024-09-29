@@ -1,7 +1,7 @@
 'use client';
 
 import { useFormState, useFormStatus } from 'react-dom';
-import { login, signup, createTodos } from '@/app/actions';
+import { signup, createTodos, newLogin } from '@/app/actions';
 import {
 	useForm,
 	getFormProps,
@@ -9,7 +9,7 @@ import {
 	getFieldsetProps,
 } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod';
-import { todosSchema, loginSchema, createSignupSchema } from '@/app/schema';
+import { todosSchema, createSignupSchema } from '@/app/schema';
 
 function Button(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
 	const { pending } = useFormStatus();
@@ -105,14 +105,14 @@ export function TodoForm() {
 }
 
 export function LoginForm() {
-	const [lastResult, action] = useFormState(login, undefined);
+	const [lastResult, action] = useFormState(newLogin, undefined);
 	const [form, fields] = useForm({
 		// Sync the result of last submission
 		lastResult,
 
 		// Reuse the validation logic on the client
 		onValidate({ formData }) {
-			return parseWithZod(formData, { schema: loginSchema });
+			return parseWithZod(formData, { schema: newLogin.inputSchema });
 		},
 
 		// Validate the form on blur event triggered

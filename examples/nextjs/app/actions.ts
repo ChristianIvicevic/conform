@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation';
 import { parseWithZod } from '@conform-to/zod';
 import { todosSchema, loginSchema, createSignupSchema } from '@/app/schema';
+import { defineAction } from '@/app/define-action';
 
 export async function login(prevState: unknown, formData: FormData) {
 	const submission = parseWithZod(formData, {
@@ -15,6 +16,13 @@ export async function login(prevState: unknown, formData: FormData) {
 
 	redirect(`/?value=${JSON.stringify(submission.value)}`);
 }
+
+export const newLogin = defineAction({
+	schema: loginSchema,
+	handler: ({ input }) => {
+		redirect(`/?value=${JSON.stringify(input)}`);
+	},
+});
 
 export async function createTodos(prevState: unknown, formData: FormData) {
 	const submission = parseWithZod(formData, {
